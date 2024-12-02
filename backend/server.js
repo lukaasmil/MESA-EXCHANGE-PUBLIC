@@ -9,12 +9,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 const port = process.env.PORT || 3000;
 
-const CLIENT_ID = process.env.CLIENT_ID;
-const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const REDIRECT_URI = process.env.REDIRECT_URI;
+const CLIENT_ID = "6099093768007299381";
+const CLIENT_SECRET = "RBX-G0YAntqZ3k2P6w8NCUgjW25bDNUEh_FeoXQYMSLoPTQc9c89_8oyIYUHCBieRzny";
+const REDIRECT_URI = "https://mesa-exchange.onrender.com";
 
 app.get('/login', (req, res) => {
-    const authURL = `https://apis.roblox.com/oauth/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=profile`;
+    const authURL = `https://apis.roblox.com/oauth/authorize?response_type=code&client_id=6099093768007299381&redirect_uri=https://mesa-exchange.onrender.com/callback&scope=profile`;
     res.redirect(authURL);
 });
 
@@ -22,11 +22,12 @@ app.get('/callback', async (req, res) => {
     const code = req.query.code;  // The authorization code from Roblox
 
     try {
+        // Make the request to Roblox's OAuth token endpoint to exchange code for access token
         const response = await axios.post('https://apis.roblox.com/oauth/token', null, {
             params: {
                 grant_type: 'authorization_code',
                 code: code,
-                redirect_uri: process.env.REDIRECT_URI  // The same URI registered on Roblox
+                redirect_uri: process.env.REDIRECT_URI  // Should match what you've set in Roblox
             },
             headers: {
                 'Authorization': `Basic ${Buffer.from(`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`).toString('base64')}`,
@@ -35,13 +36,22 @@ app.get('/callback', async (req, res) => {
         });
 
         const accessToken = response.data.access_token;
-        // Use the access token to fetch user data
+        console.log('Access Token:', accessToken);
 
-        // Optionally: Redirect the user to a success page
-        res.redirect('/success');
+        // Use the access token to fetch user data or process further
+        // e.g., fetch user info from Roblox's user endpoint using the access token
+        const userData = await axios.get('https://apis.roblox.com/v1/users/me', {
+            headers: { Authorization: `Bearer ${accessToken}` }
+        });
+
+        console.log('User Data:', userData.data);
+
+        // Redirect the user after successful login
+        res.redirect('/success');  // Redirect to a success page or dashboard
+
     } catch (error) {
         console.error('Error during OAuth exchange:', error.response ? error.response.data : error);
-        res.status(500).send('An error occurred while processing your login.');
+        res.status(500).json({ errors: [{ message: error.message, code: error.response ? error.response.status : 0 }] });
     }
 });
 
