@@ -9,52 +9,67 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 const port = process.env.PORT || 3000;
 
-const CLIENT_ID = "6099093768007299381";
-const CLIENT_SECRET = "RBX-G0YAntqZ3k2P6w8NCUgjW25bDNUEh_FeoXQYMSLoPTQc9c89_8oyIYUHCBieRzny";
-const REDIRECT_URI = "https://mesa-exchange.onrender.com";
+// Load sensitive data from .env
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const REDIRECT_URI = process.env.REDIRECT_URI;
 
+// Route to initiate OAuth login
 app.get('/login', (req, res) => {
-    const authURL = `https://apis.roblox.com/oauth/authorize?response_type=code&client_id=6099093768007299381&redirect_uri=https://mesa-exchange.onrender.com/callback&scope=profile`;
+    const authURL = `https://apis.roblox.com/oauth/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=profile`;
     res.redirect(authURL);
 });
 
+// Callback route to handle the authorization code and exchange for an access token
 app.get('/callback', async (req, res) => {
-    const code = req.query.code;  // The authorization code from Roblox
+    const code = req.query.code;
+
+    if (!code) {
+        return res.redirect(`/error?message=${encodeURIComponent('Authorization code not provided')}`);
+    }
 
     try {
-        // Make the request to Roblox's OAuth token endpoint to exchange code for access token
-        const response = await axios.post('https://apis.roblox.com/oauth/token', null, {
+        const tokenResponse = await axios.post('https://apis.roblox.com/oauth/token', null, {
             params: {
                 grant_type: 'authorization_code',
                 code: code,
-                redirect_uri: process.env.REDIRECT_URI  // Should match what you've set in Roblox
+                redirect_uri: REDIRECT_URI
             },
             headers: {
-                'Authorization': `Basic ${Buffer.from(`${process.env.CLIENT_ID}:${process.env.CLIENT_SECRET}`).toString('base64')}`,
+                'Authorization': `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         });
 
-        const accessToken = response.data.access_token;
-        console.log('Access Token:', accessToken);
+        const accessToken = tokenResponse.data.access_token;
 
-        // Use the access token to fetch user data or process further
-        // e.g., fetch user info from Roblox's user endpoint using the access token
-        const userData = await axios.get('https://apis.roblox.com/v1/users/me', {
+        // Optional: Fetch user data from Roblox API
+        const userResponse = await axios.get('https://apis.roblox.com/v1/users/me', {
             headers: { Authorization: `Bearer ${accessToken}` }
         });
 
-        console.log('User Data:', userData.data);
+        console.log('User Data:', userResponse.data);
 
-        // Redirect the user after successful login
-        res.redirect('/success');  // Redirect to a success page or dashboard
+        // Redirect the user to a success page
+        res.redirect('/success');
 
     } catch (error) {
         console.error('Error during OAuth exchange:', error.response ? error.response.data : error);
-        res.status(500).json({ errors: [{ message: error.message, code: error.response ? error.response.status : 0 }] });
+        res.redirect(`/error?message=${encodeURIComponent('Failed to authenticate')}`);
     }
 });
 
+// Example success route
+app.get('/success', (req, res) => {
+    res.send('<h1>Login Successful!</h1>');
+});
+
+// Example error route
+app.get('/error', (req, res) => {
+    res.send(`<h1>Error</h1><p>${req.query.message}</p>`);
+});
+
+// Start the server
 app.listen(port, () => {
     console.log(`Backend running on http://localhost:${port}`);
 });
