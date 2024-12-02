@@ -48,7 +48,7 @@ app.get('/callback', async (req, res) => {
             headers: { Authorization: `Bearer ${accessToken}` }
         });
 
-        console.log('User Data:', userResponse.data);
+        console.log('User  Data:', userResponse.data);
 
         // Redirect the user to a success page
         res.redirect('/success');
