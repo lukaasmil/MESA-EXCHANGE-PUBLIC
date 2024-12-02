@@ -45,10 +45,6 @@ app.get('/callback', async (req, res) => {
     }
 });
 
-<<<<<<< HEAD
-
-=======
->>>>>>> d838a0cd97fb143d87e61b168734cb8806c8f49a
 app.listen(port, () => {
     console.log(`Backend running on http://localhost:${port}`);
 });
