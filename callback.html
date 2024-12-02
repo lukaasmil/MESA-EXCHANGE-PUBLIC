@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Callback</title>
+</head>
+<body>
+    <h1>Login Successful</h1>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const authCode = params.get('code');
+        if (authCode) {
+            // Send authCode to your backend to exchange for an access token
+            fetch('https://your-backend-service/token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: authCode }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Access Token:', data.access_token);
+                // Save the token or use it to fetch user info
+            })
+            .catch(error => console.error('Error:', error));
+        } else {
+            console.error('Authorization code not found.');
+        }
+    </script>
+</body>
+</html>
