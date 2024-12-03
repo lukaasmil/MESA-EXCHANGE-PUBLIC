@@ -19,7 +19,6 @@ app.get('/', (req, res) => {
     res.send('<h1>Welcome to Mesa Exchange</h1><a href="/login">Log in with Roblox</a>');
 });
 
-// Route to initiate OAuth login
 app.get('/login', (req, res) => {
     const authURL = `https://apis.roblox.com/oauth/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=profile`;
     console.log('Redirecting to:', authURL); // Log the URL for debugging
