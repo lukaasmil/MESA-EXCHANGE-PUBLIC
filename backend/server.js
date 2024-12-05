@@ -43,11 +43,9 @@ app.get('/callback', async (req, res) => {
         
         const tokenResponse = await axios.post('https://apis.roblox.com/oauth/v1/token', params);
 
-        console.log(tokenResponse.data)
-
         const accessToken = tokenResponse.data.access_token;
 
-        const userResponse = await axios.get('https://apis.roblox.com/v1/users/me', {
+        const userResponse = await axios.get('https://apis.roblox.com/v1/userinfo', {
             headers: { Authorization: `Bearer ${accessToken}` }
         });
 
