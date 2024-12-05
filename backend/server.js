@@ -35,13 +35,20 @@ app.get('/callback', async (req, res) => {
     try {
         const params = new URLSearchParams()
 
-        params.append(`grant_type`, 'authorization_code', )
-        params.append(`code`)
-        params.append(`redirect_uri`)
-        params.append(`client_id`)
-        params.append(`client_secret`)
-
-        const tokenResponse = await axios.post('https://apis.roblox.com/oauth/v1/token', params, {
+        params.append(`grant_type`, 'authorization_code')
+        params.append(`code`, code)
+        params.append(`redirect_uri`, REDIRECT_URI)
+        params.append(`client_id`, CLIENT_ID)
+        params.append(`client_secret`, CLIENT_SECRET)
+        
+        const tokenResponse = await axios.post('https://apis.roblox.com/oauth/v1/token', null, {
+            params: {
+                grant_type: 'authorization_code',
+                code: code,
+                redirect_uri: REDIRECT_URI,
+                client_id: CLIENT_ID,
+                client_secret: CLIENT_SECRET
+            },
             headers: {
                 'Authorization': `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
                 'Content-Type': 'application/x-www-form-urlencoded'
