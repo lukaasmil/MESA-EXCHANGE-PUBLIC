@@ -33,7 +33,7 @@ app.get('/callback', async (req, res) => {
     }
 
     try {
-        const tokenResponse = await axios.post('https://apis.roblox.com/oauth/token', null, {
+        const tokenResponse = await axios.post('https://apis.roblox.com/oauth/v1/token', null, {
             params: {
                 grant_type: 'authorization_code',
                 code: code,
