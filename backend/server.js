@@ -3,19 +3,39 @@ const express = require('express');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const session = require('express-session');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 const port = process.env.PORT || 3000;
 
+// Session setup
+app.use(session({
+    secret: process.env.SESSION_SECRET, // Replace with a strong secret key
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } // Set secure: true in production if using HTTPS
+}));
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
 app.get('/', (req, res) => {
-    res.send('<h1>Welcome to Mesa Exchange</h1><a href="/login">Log in with Roblox</a>');
+    if (req.session.user) {
+        // If user is logged in, show their name and picture
+        const user = req.session.user;
+        res.send(`
+            <h1>Welcome to Mesa Exchange</h1>
+            <p>Hello, ${user.name}</p>
+            <img src="${user.picture}" alt="User Picture" width="100" height="100">
+            <a href="/logout">Logout</a>
+        `);
+    } else {
+        // If not logged in, show login button
+        res.send('<h1>Welcome to Mesa Exchange</h1><a href="/login">Log in with Roblox</a>');
+    }
 });
 
 app.get('/login', (req, res) => {
@@ -25,7 +45,6 @@ app.get('/login', (req, res) => {
     res.redirect(authURL);
 });
 
-
 app.get('/callback', async (req, res) => {
     const code = String(req.query.code);
 
@@ -34,35 +53,46 @@ app.get('/callback', async (req, res) => {
     }
 
     try {
-        const params = new URLSearchParams()
+        const params = new URLSearchParams();
 
-        params.append(`grant_type`, 'authorization_code')
-        params.append(`code`, code)
-        params.append(`redirect_uri`, REDIRECT_URI)
-        params.append(`client_id`, CLIENT_ID)
-        params.append(`client_secret`, CLIENT_SECRET)
+        params.append(`grant_type`, 'authorization_code');
+        params.append(`code`, code);
+        params.append(`redirect_uri`, REDIRECT_URI);
+        params.append(`client_id`, CLIENT_ID);
+        params.append(`client_secret`, CLIENT_SECRET);
         
         const tokenResponse = await axios.post('https://apis.roblox.com/oauth/v1/token', params);
 
         const accessToken = tokenResponse.data.access_token;
 
-
         const userResponse = await axios.get('https://apis.roblox.com/oauth/v1/userinfo', {
             headers: { Authorization: `Bearer ${accessToken}` }
         });
 
-        console.log('User  Data:', userResponse.data);
+        console.log('User Data:', userResponse.data);
 
-        res.redirect('/success');
+        // Save user data in session
+        req.session.user = {
+            name: userResponse.data.name, // Adjust based on actual response field
+            picture: userResponse.data.picture // Adjust based on actual response field
+        };
 
+        res.redirect('/');
     } catch (error) {
         console.error('Error during OAuth exchange:', error.response ? error.response.data : error);
         res.redirect(`/error?message=${encodeURIComponent('Failed to authenticate')}`);
     }
 });
 
-app.get('/success', (req, res) => {
-    res.send('<h1>Login Successful!</h1>');
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error during logout:', err);
+            res.send('Error logging out');
+        } else {
+            res.redirect('/');
+        }
+    });
 });
 
 app.get('/error', (req, res) => {
