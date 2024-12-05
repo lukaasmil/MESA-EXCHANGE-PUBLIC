@@ -140,136 +140,24 @@
             flex: 1;
             overflow-y: auto;
         }
+
+        .chat-message {
+            background-color: #21262d;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+        }
+
+        .chat-message.admin {
+            background-color: #1f2b36;
+        }
+
+        .chat-message-user {
+            background-color: #2b3a47;
+        }
     </style>
 </head>
 <body class="flex h-screen">
-    <!-- Chat Sidebar -->
-    <div class="w-64 bg-[#161b22] p-4 flex flex-col justify-between">
-        <div>
-            <div class="mb-8">
-                <button class="bg-[#21262d] text-white py-2 px-4 rounded-full w-full flex items-center justify-between">
-                    <span>Mesa Exchange</span>
-                </button>
-            </div>
-            <nav class="space-y-4">
-                <a class="nav-item flex items-center text-white py-2 px-4 rounded-lg active" href="#" id="nav-dashboard" onclick="showSection('dashboard')">
-                    <i class="fas fa-th-large mr-3"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a class="nav-item flex items-center py-2 px-4 rounded-lg" href="#" id="nav-my-coins" onclick="showSection('my-coins')">
-                    <i class="fas fa-coins mr-3"></i>
-                    <span>My Coins</span>
-                </a>
-                <a class="nav-item flex items-center py-2 px-4 rounded-lg relative" href="#" id="nav-markets" onclick="showSection('markets')">
-                    <i class="fas fa-chart-line mr-3"></i>
-                    <span>Markets</span>
-                </a>
-                <a class="nav-item flex items-center py-2 px-4 rounded-lg" href="#" id="nav-trading" onclick="showSection('trading')">
-                    <i class="fas fa-exchange-alt mr-3"></i>
-                    <span>Trading</span>
-                </a>
-                <a class="nav-item flex items-center py-2 px-4 rounded-lg" href="#" id="nav-transactions" onclick="showSection('transactions')">
-                    <i class="fas fa-wallet mr-3"></i>
-                    <span>Transactions</span>
-                </a>
-            </nav>
-        </div>
-        <div class="flex flex-col space-y-4">
-            <div class="social-icons">
-                <div class="glow-green">
-                    <a href="https://discord.gg/NFS6JAPT" target="_blank">
-                        <i class="fab fa-discord text-2xl"></i>
-                    </a>
-                </div>
-                <div class="glow-green">
-                    <i class="fab fa-twitter text-2xl"></i>
-                </div>
-            </div>
-            <a class="logout-button flex items-center py-2 px-4 rounded-lg" href="#">
-                <i class="fas fa-sign-out-alt mr-3"></i>
-                <span>Log Out</span>
-            </a>
-        </div>
-    </div>
-    <!-- Main Content -->
-    <div class="flex-1 p-6 overflow-hidden">
-        <header class="flex items-center justify-between mb-8">
-            <div></div>
-            <div class="flex items-center space-x-4">
-                <div>
-                    <button onclick="window.location.href='https://mesa-exchange.onrender.com/login'">
-                        Log in with Roblox
-                    </button>       
-                </div>
-                <div class="flex items-center space-x-2">
-                    <span class="text-lg font-bold" id="total-balance">$0.00</span>
-                    <button class="deposit-button" onclick="openModal('deposit-modal')">Deposit</button>
-                </div>
-            </div>
-        </header>
-        <main>
-            <div class="bg-gradient-to-r from-[#161b22] to-[#0d1117] p-6 rounded-lg balance-card" id="dashboard">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-2xl font-bold">My Balance</h2>
-                    <div class="flex items-center space-x-2">
-                        <button class="bg-[#21262d] text-white py-1 px-3 rounded-full">24h</button>
-                        <button class="bg-[#21262d] text-white py-1 px-3 rounded-full">
-                            <i class="fas fa-eye-slash"></i>
-                        </button>
-                        <button class="bg-[#21262d] text-white py-1 px-3 rounded-full">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="text-4xl font-bold mb-2" id="balance-amount">$0.00</div>
-                <div class="text-red-500 text-lg font-semibold mb-2" id="balance-change">$0.00 (0.00%)</div>
-                <div class="text-gray-400 text-sm mb-4" id="balance-percentage">0.00% More than last week period</div>
-                <div class="flex space-x-4 mb-6">
-                    <button class="gradient-button buy-button flex items-center justify-center w-full" onclick="openModal('buy-modal')">
-                        <i class="fas fa-arrow-up mr-2"></i>
-                        Buy
-                    </button>
-                    <button class="gradient-button sell-button flex items-center justify-center w-full" onclick="openModal('sell-modal')">
-                        <i class="fas fa-arrow-down mr-2"></i>
-                        Sell
-                    </button>
-                </div>
-                <div class="bg-[#21262d] p-4 rounded-lg">
-                    <h3 class="text-xl font-bold mb-2">My Portfolio</h3>
-                    <div class="text-gray-400 text-sm">Detailed view of your assets and performance.</div>
-                </div>
-            </div>
-            <div class="hidden bg-gradient-to-r from-[#161b22] to-[#0d1117] p-6 rounded-lg" id="my-coins">
-                <h2 class="text-2xl font-bold mb-4">My Coins</h2>
-                <ul class="space-y-4">
-                    <li class="bg-[#21262d] p-4 rounded-lg flex justify-between items-center">
-                        <span>Bitcoin (BTC)</span>
-                        <span>1.234 BTC</span>
-                    </li>
-                    <li class="bg-[#21262d] p-4 rounded-lg flex justify-between items-center">
-                        <span>Ethereum (ETH)</span>
-                        <span>10.567 ETH</span>
-                    </li>
-                    <li class="bg-[#21262d] p-4 rounded-lg flex justify-between items-center">
-                        <span>Litecoin (LTC)</span>
-                        <span>50.789 LTC</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="hidden bg-gradient-to-r from-[#161b22] to-[#0d1117] p-6 rounded-lg" id="markets">
-                <h2 class="text-2xl font-bold mb-4">Markets</h2>
-                <p class="text-gray-400">Market data will be displayed here.</p>
-            </div>
-            <div class="hidden bg-gradient-to-r from-[#161b22] to-[#0d1117] p-6 rounded-lg" id="trading">
-                <h2 class="text-2xl font-bold mb-4">Trading</h2>
-                <p class="text-gray-400">Trading interface will be displayed here.</p>
-            </div>
-            <div class="hidden bg-gradient-to-r from-[#161b22] to-[#0d1117] p-6 rounded-lg" id="transactions">
-                <h2 class="text-2xl font-bold mb-4">Transactions</h2>
-                <p class="text-gray-400">Transaction history will be displayed here.</p>
-            </div>
-        </main>
-    </div>
     <!-- Chat Sidebar -->
     <div class="w-64 bg-[#161b22] p-4 flex flex-col justify-between">
         <div class="chat-container space-y-4" id="chat-messages">
@@ -282,73 +170,18 @@
             </button>
         </div>
     </div>
-    <!-- Deposit Modal -->
-    <div class="modal hidden" id="deposit-modal">
-        <div class="modal-content">
-            <h2 class="text-2xl font-bold mb-4">Deposit Funds</h2>
-            <div class="flex justify-around mb-4">
-                <button class="deposit-button" onclick="selectPaymentMethod('credit-card')">
-                    <i class="fas fa-credit-card"></i>
-                </button>
-                <button class="deposit-button" onclick="selectPaymentMethod('paypal')">
-                    <i class="fab fa-paypal"></i>
-                </button>
-                <button class="deposit-button" onclick="selectPaymentMethod('crypto')">
-                    <i class="fas fa-coins"></i>
-                </button>
-                <button class="deposit-button" onclick="selectPaymentMethod('robux')">
-                    <i class="fas fa-robot"></i>
-                </button>
-            </div>
-            <label for="deposit-amount">Amount</label>
-            <input id="deposit-amount" placeholder="Enter amount" type="number"/>
-            <button class="deposit-button" onclick="depositFunds()">Deposit</button>
-            <button class="deposit-button bg-red-600 mt-2" onclick="closeModal('deposit-modal')">Cancel</button>
-        </div>
-    </div>
+
     <script>
         const currentUser = 'admin'; // Change this to simulate different users
 
-        function showSection(sectionId) {
-            const sections = document.querySelectorAll('main > div');
-            sections.forEach(section => {
-                section.classList.add('hidden');
-            });
-            document.getElementById(sectionId).classList.remove('hidden');
-        }
-
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.remove('hidden');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-        }
-
-        function depositFunds() {
-            const amount = parseFloat(document.getElementById('deposit-amount').value);
-            if (!isNaN(amount) && amount > 0) {
-                const totalBalanceElement = document.getElementById('total-balance');
-                const balanceAmountElement = document.getElementById('balance-amount');
-                const currentBalance = parseFloat(totalBalanceElement.textContent.replace('$', ''));
-                const newBalance = currentBalance + amount;
-                totalBalanceElement.textContent = `$${newBalance.toFixed(2)}`;
-                balanceAmountElement.textContent = `$${newBalance.toFixed(2)}`;
-                closeModal('deposit-modal');
-            }
-        }
-
-        function selectPaymentMethod(method) {
-            console.log(`Selected payment method: ${method}`);
-        }
-
+        // Function to handle sending a message
         function sendMessage() {
             const chatInput = document.getElementById('chat-input');
             const message = chatInput.value.trim();
             if (message) {
                 const chatMessages = document.getElementById('chat-messages');
                 const messageElement = document.createElement('div');
-                messageElement.classList.add('bg-[#21262d]', 'p-4', 'rounded-lg', 'mb-4');
+                messageElement.classList.add('chat-message', currentUser === 'admin' ? 'admin' : 'chat-message-user');
                 messageElement.innerHTML = `
                     <div class="flex items-center mb-2">
                         <div class="rounded-full bg-gray-400 mr-2" style="height: 30px; width: 30px;"></div>
@@ -362,5 +195,6 @@
             }
         }
     </script>
+
 </body>
 </html>
