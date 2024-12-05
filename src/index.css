@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+@layer base {
+  :root {
+    --background: 222 47% 8%;
+    --foreground: 213 31% 91%;
+
+    --card: 222 47% 10%;
+    --card-foreground: 213 31% 91%;
+
+    --popover: 222 47% 8%;
+    --popover-foreground: 215 20.2% 65.1%;
+
+    --primary: 151 100% 50%;
+    --primary-foreground: 222 47% 8%;
+
+    --secondary: 222 47% 10%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 223 47% 12%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 151 100% 50%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+    --ring: 151 100% 50%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-inter;
+    background-image: radial-gradient(circle at 50% 50%, hsl(222, 47%, 12%) 0%, hsl(222, 47%, 8%) 50%, hsl(222, 47%, 6%) 100%);
+  }
+}
+
+/* Enhanced glow effects */
+.coin-icon-glow {
+  filter: drop-shadow(0 0 20px rgba(0, 255, 157, 0.4));
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.card-glow {
+  box-shadow: 0 0 25px rgba(0, 255, 157, 0.15);
+}
+
+.bg-300% {
+  background-size: 300% 300%;
+}
+
+@keyframes text-gradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-text {
+  animation: text-gradient 3s ease infinite;
+}
+
+.animate-gradient {
+  animation: gradient 6s linear infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
