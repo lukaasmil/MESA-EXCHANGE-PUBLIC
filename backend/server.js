@@ -37,7 +37,9 @@ app.get('/callback', async (req, res) => {
             params: {
                 grant_type: 'authorization_code',
                 code: code,
-                redirect_uri: REDIRECT_URI
+                redirect_uri: REDIRECT_URI,
+                client_id: CLIENT_ID,
+                client_secret: CLIENT_SECRET
             },
             headers: {
                 'Authorization': `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
