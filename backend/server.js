@@ -26,7 +26,7 @@ app.get('/login', (req, res) => {
 
 
 app.get('/callback', async (req, res) => {
-    const code = req.query.code;
+    const code = String(req.query.code);
 
     if (!code) {
         return res.redirect(`/error?message=${encodeURIComponent('Authorization code not provided')}`);
@@ -41,19 +41,7 @@ app.get('/callback', async (req, res) => {
         params.append(`client_id`, CLIENT_ID)
         params.append(`client_secret`, CLIENT_SECRET)
         
-        const tokenResponse = await axios.post('https://apis.roblox.com/oauth/v1/token', null, {
-            params: {
-                grant_type: 'authorization_code',
-                code: code,
-                redirect_uri: REDIRECT_URI,
-                client_id: CLIENT_ID,
-                client_secret: CLIENT_SECRET
-            },
-            headers: {
-                'Authorization': `Basic ${Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64')}`,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        });
+        const tokenResponse = await axios.post('https://apis.roblox.com/oauth/v1/token', params);
 
         const accessToken = tokenResponse.data.access_token;
 
