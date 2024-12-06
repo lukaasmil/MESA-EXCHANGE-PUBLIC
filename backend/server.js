@@ -1,82 +1,110 @@
-const express = require('express');
-const cors = require('cors');
-const axios = require('axios');
 require('dotenv').config();
+const express = require('express');
+const axios = require('axios');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const session = require('express-session');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
+const port = process.env.PORT || 3000;
 
-// Middleware
-app.use(express.json());
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? 'https://mesa-exchange.lovable.dev'  // Replace with your frontend URL
-    : 'http://localhost:5173',
-  credentials: true
+
+app.use(session({
+    secret: process.env.SESSION_SECRET, 
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false } 
 }));
 
-// Health check endpoint for Render
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const REDIRECT_URI = process.env.REDIRECT_URI;
+
 app.get('/', (req, res) => {
-  res.send('Mesa Exchange Backend is running!');
+    if (req.session.user) {
+       
+        const user = req.session.user;
+        res.send(`
+            <h1>Welcome to Mesa Exchange</h1>
+            <p>Hello, ${user.name}</p>
+            <img src="${user.picture}" alt="User Picture" width="100" height="100">
+            <a href="/logout">Logout</a>
+        `);
+    } else {
+        
+        res.send('<h1>Welcome to Mesa Exchange</h1><a href="/login">Log in with Roblox</a>');
+    }
 });
 
-// Roblox OAuth callback endpoint
-app.post('/auth/roblox/callback', async (req, res) => {
-  try {
-    const { code, redirect_uri } = req.body;
-    
-    console.log('Received callback request:', {
-      code: code ? 'present' : 'missing',
-      redirect_uri
-    });
+app.get('/login', (req, res) => {
+    const authURL = `https://apis.roblox.com/oauth/v1/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=openid%20profile`;
 
-    // Exchange code for access token
-    const tokenResponse = await axios.post('https://apis.roblox.com/oauth/v1/token', {
-      client_id: process.env.ROBLOX_CLIENT_ID,
-      client_secret: process.env.ROBLOX_CLIENT_SECRET,
-      code,
-      grant_type: 'authorization_code',
-      redirect_uri
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      }
-    });
-
-    const { access_token } = tokenResponse.data;
-
-    // Get user info using the access token
-    const userResponse = await axios.get('https://apis.roblox.com/oauth/v1/userinfo', {
-      headers: {
-        'Authorization': `Bearer ${access_token}`
-      }
-    });
-
-    const userData = userResponse.data;
-
-    // Get user avatar
-    const avatarResponse = await axios.get(`https://thumbnails.roblox.com/v1/users/avatar?userIds=${userData.sub}&size=420x420&format=Png`);
-    const avatarUrl = avatarResponse.data.data[0]?.imageUrl || '';
-
-    // Prepare user data for frontend
-    const user = {
-      id: userData.sub,
-      name: userData.nickname,
-      displayName: userData.preferred_username || userData.name,
-      avatar: avatarUrl
-    };
-
-    res.json(user);
-  } catch (error) {
-    console.error('Auth error:', error.response?.data || error.message);
-    res.status(500).json({
-      error: 'Authentication failed',
-      details: error.response?.data || error.message
-    });
-  }
+    console.log('Redirecting to:', authURL);
+    res.redirect(authURL);
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.get('/callback', async (req, res) => {
+    const code = String(req.query.code);
+
+    if (!code) {
+        return res.redirect(`/error?message=${encodeURIComponent('Authorization code not provided')}`);
+    }
+
+    try {
+        const params = new URLSearchParams();
+
+        params.append(`grant_type`, 'authorization_code');
+        params.append(`code`, code);
+        params.append(`redirect_uri`, REDIRECT_URI);
+        params.append(`client_id`, CLIENT_ID);
+        params.append(`client_secret`, CLIENT_SECRET);
+        
+        const tokenResponse = await axios.post('https://apis.roblox.com/oauth/v1/token', params);
+
+        const accessToken = tokenResponse.data.access_token;
+
+        const userResponse = await axios.get('https://apis.roblox.com/oauth/v1/userinfo', {
+            headers: { Authorization: `Bearer ${accessToken}` }
+        });
+
+        console.log('User Data:', userResponse.data);
+
+       
+        req.session.user = {
+            name: userResponse.data.name, 
+            picture: userResponse.data.picture 
+        };
+
+        res.redirect('/');
+    } catch (error) {
+        console.error('Error during OAuth exchange:', error.response ? error.response.data : error);
+        res.redirect(`/error?message=${encodeURIComponent('Failed to authenticate')}`);
+    }
 });
+
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Error during logout:', err);
+            res.send('Error logging out');
+        } else {
+            res.redirect('/');
+        }
+    });
+});
+
+app.get('/error', (req, res) => {
+    res.send(`<h1>Error</h1><p>${req.query.message}</p>`);
+});
+
+app.listen(port, () => {
+    console.log(`Backend running on http://localhost:${port}`);
+});
+
+const corsOptions = {
+    origin: 'https://mesa-exchange.onrender.com', 
+    optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
