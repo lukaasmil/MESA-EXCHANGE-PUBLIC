@@ -10,12 +10,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 const port = process.env.PORT || 3000;
 
-// Session setup
+
 app.use(session({
-    secret: process.env.SESSION_SECRET, // Replace with a strong secret key
+    secret: process.env.SESSION_SECRET, 
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false } // Set secure: true in production if using HTTPS
+    cookie: { secure: false } 
 }));
 
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -24,7 +24,7 @@ const REDIRECT_URI = process.env.REDIRECT_URI;
 
 app.get('/', (req, res) => {
     if (req.session.user) {
-        // If user is logged in, show their name and picture
+       
         const user = req.session.user;
         res.send(`
             <h1>Welcome to Mesa Exchange</h1>
@@ -33,7 +33,7 @@ app.get('/', (req, res) => {
             <a href="/logout">Logout</a>
         `);
     } else {
-        // If not logged in, show login button
+        
         res.send('<h1>Welcome to Mesa Exchange</h1><a href="/login">Log in with Roblox</a>');
     }
 });
@@ -71,10 +71,10 @@ app.get('/callback', async (req, res) => {
 
         console.log('User Data:', userResponse.data);
 
-        // Save user data in session
+       
         req.session.user = {
-            name: userResponse.data.name, // Adjust based on actual response field
-            picture: userResponse.data.picture // Adjust based on actual response field
+            name: userResponse.data.name, 
+            picture: userResponse.data.picture 
         };
 
         res.redirect('/');
