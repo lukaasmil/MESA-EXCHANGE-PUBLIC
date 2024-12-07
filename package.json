@@ -1,6 +1,6 @@
 {
   "name": "mesa-exchange",
-  "version": "1.0.0",
+  "version": "beta_0.2",
   "scripts": {
     "start": "node backend/server.js"
   },
