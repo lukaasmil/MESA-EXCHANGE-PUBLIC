@@ -4,7 +4,7 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const session = require('express-session');
-const path = require('path')
+const path = require('path'); // Ensure 'path' is imported at the top
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -23,12 +23,12 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
-
-app.use(express.static(path.join(__dirname, 'public')));
-
 
 app.get('/login', (req, res) => {
     const authURL = `https://apis.roblox.com/oauth/v1/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=openid%20profile`;
@@ -36,8 +36,6 @@ app.get('/login', (req, res) => {
     console.log('Redirecting to:', authURL);
     res.redirect(authURL);
 });
-
-const path = require('path'); // Add this at the top with other imports
 
 app.get('/callback', async (req, res) => {
     const code = String(req.query.code);
@@ -56,7 +54,6 @@ app.get('/callback', async (req, res) => {
         params.append('client_secret', CLIENT_SECRET);
 
         const tokenResponse = await axios.post('https://apis.roblox.com/oauth/v1/token', params);
-
         const accessToken = tokenResponse.data.access_token;
 
         const userResponse = await axios.get('https://apis.roblox.com/oauth/v1/userinfo', {
@@ -71,14 +68,13 @@ app.get('/callback', async (req, res) => {
             picture: userResponse.data.picture,
         };
 
-        // Serve the index.html file after login
-        res.sendFile(path.join(__dirname, 'public', 'index.html'));
+        console.log('Redirecting to / after successful login');
+        res.redirect('/');
     } catch (error) {
         console.error('Error during OAuth exchange:', error.response ? error.response.data : error);
         res.redirect(`/error?message=${encodeURIComponent('Failed to authenticate')}`);
     }
 });
-
 
 app.get('/logout', (req, res) => {
     req.session.destroy((err) => {
@@ -95,16 +91,6 @@ app.get('/error', (req, res) => {
     res.send(`<h1>Error</h1><p>${req.query.message}</p>`);
 });
 
-app.listen(port, () => {
-    console.log(`Backend running on http://localhost:${port}`);
-});
-
-const corsOptions = {
-    origin: 'https://mesa-exchange.onrender.com', 
-    optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
-
 app.get('/user-info', (req, res) => {
     if (req.session.user) {
         res.json(req.session.user);
@@ -112,3 +98,15 @@ app.get('/user-info', (req, res) => {
         res.json({});
     }
 });
+
+// Start the server
+app.listen(port, () => {
+    console.log(`Backend running on http://localhost:${port}`);
+});
+
+// CORS options
+const corsOptions = {
+    origin: 'https://mesa-exchange.onrender.com',
+    optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
