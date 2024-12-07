@@ -4,7 +4,7 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const session = require('express-session');
-const path = require('path'); // Ensure 'path' is imported at the top
+const path = require('path'); // Ensure 'path' is at the top
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -23,11 +23,12 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
-// Serve static files from the 'public' directory
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static files from the 'public' directory in the root of the project
+app.use(express.static(path.join(__dirname, '..', 'public')));
 
+// Serve the index.html file after login
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
 });
 
 app.get('/login', (req, res) => {
@@ -99,12 +100,10 @@ app.get('/user-info', (req, res) => {
     }
 });
 
-// Start the server
 app.listen(port, () => {
     console.log(`Backend running on http://localhost:${port}`);
 });
 
-// CORS options
 const corsOptions = {
     origin: 'https://mesa-exchange.onrender.com',
     optionsSuccessStatus: 200
