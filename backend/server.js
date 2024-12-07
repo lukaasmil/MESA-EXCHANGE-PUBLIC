@@ -10,12 +10,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 const port = process.env.PORT || 3000;
 
-
+// Session setup
 app.use(session({
-    secret: process.env.SESSION_SECRET, 
+    secret: process.env.SESSION_SECRET, // Replace with a strong secret key
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false } 
+    cookie: { secure: false } // Set secure: true in production if using HTTPS
 }));
 
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -23,20 +23,9 @@ const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
 app.get('/', (req, res) => {
-    if (req.session.user) {
-       
-        const user = req.session.user;
-        res.send(`
-            <h1>Welcome to Mesa Exchange</h1>
-            <p>Hello, ${user.name}</p>
-            <img src="${user.picture}" alt="User Picture" width="100" height="100">
-            <a href="/logout">Logout</a>
-        `);
-    } else {
-        
-        res.send('<h1>Welcome to Mesa Exchange</h1><a href="/login">Log in with Roblox</a>');
-    }
+    res.send('<h1>Welcome to Mesa Exchange</h1><a href="/login">Log in with Roblox</a>');
 });
+
 
 app.get('/login', (req, res) => {
     const authURL = `https://apis.roblox.com/oauth/v1/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=openid%20profile`;
@@ -71,10 +60,10 @@ app.get('/callback', async (req, res) => {
 
         console.log('User Data:', userResponse.data);
 
-       
+        // Save user data in session
         req.session.user = {
-            name: userResponse.data.name, 
-            picture: userResponse.data.picture 
+            name: userResponse.data.name, // Adjust based on actual response field
+            picture: userResponse.data.picture // Adjust based on actual response field
         };
 
         res.redirect('/');
@@ -108,3 +97,11 @@ const corsOptions = {
     optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
+
+app.get('/user-info', (req, res) => {
+    if (req.session.user) {
+        res.json(req.session.user);
+    } else {
+        res.json({});
+    }
+});
