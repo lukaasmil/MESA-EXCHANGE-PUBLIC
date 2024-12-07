@@ -23,8 +23,10 @@ const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
 app.get('/', (req, res) => {
-    res.send('<h1>Welcome to Mesa Exchange</h1><a href="/login">Log in with Roblox</a>');
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.get('/login', (req, res) => {
@@ -33,6 +35,8 @@ app.get('/login', (req, res) => {
     console.log('Redirecting to:', authURL);
     res.redirect(authURL);
 });
+
+const path = require('path'); // Add this at the top with other imports
 
 app.get('/callback', async (req, res) => {
     const code = String(req.query.code);
@@ -44,34 +48,36 @@ app.get('/callback', async (req, res) => {
     try {
         const params = new URLSearchParams();
 
-        params.append(`grant_type`, 'authorization_code');
-        params.append(`code`, code);
-        params.append(`redirect_uri`, REDIRECT_URI);
-        params.append(`client_id`, CLIENT_ID);
-        params.append(`client_secret`, CLIENT_SECRET);
-        
+        params.append('grant_type', 'authorization_code');
+        params.append('code', code);
+        params.append('redirect_uri', REDIRECT_URI);
+        params.append('client_id', CLIENT_ID);
+        params.append('client_secret', CLIENT_SECRET);
+
         const tokenResponse = await axios.post('https://apis.roblox.com/oauth/v1/token', params);
 
         const accessToken = tokenResponse.data.access_token;
 
         const userResponse = await axios.get('https://apis.roblox.com/oauth/v1/userinfo', {
-            headers: { Authorization: `Bearer ${accessToken}` }
+            headers: { Authorization: `Bearer ${accessToken}` },
         });
 
         console.log('User Data:', userResponse.data);
 
         // Save user data in session
         req.session.user = {
-            name: userResponse.data.name, // Adjust based on actual response field
-            picture: userResponse.data.picture // Adjust based on actual response field
+            name: userResponse.data.name,
+            picture: userResponse.data.picture,
         };
 
-        res.redirect('/');
+        // Serve the index.html file after login
+        res.sendFile(path.join(__dirname, 'public', 'index.html'));
     } catch (error) {
         console.error('Error during OAuth exchange:', error.response ? error.response.data : error);
         res.redirect(`/error?message=${encodeURIComponent('Failed to authenticate')}`);
     }
 });
+
 
 app.get('/logout', (req, res) => {
     req.session.destroy((err) => {
