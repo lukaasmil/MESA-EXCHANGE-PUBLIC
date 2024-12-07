@@ -372,5 +372,20 @@
         })
         .catch(error => console.error('Error fetching user info:', error));
     </script>
+    <script>
+      fetch('/user-info')
+        .then(response => response.json())
+        .then(data => {
+          if (data.name && data.picture) {
+            document.body.innerHTML = `
+              <h1>Welcome, ${data.name}</h1>
+              <img src="${data.picture}" alt="User Picture" width="100" height="100">
+              <a href="/logout">Logout</a>
+            `;
+          }
+        })
+        .catch(error => console.error('Error fetching user info:', error));
+    </script>
+    
   </body>
 </html>
