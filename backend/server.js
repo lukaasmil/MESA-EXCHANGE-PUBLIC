@@ -28,7 +28,13 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 
 // Serve the index.html file after login
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+    // Check if the user is logged in
+    if (req.session.user) {
+        res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+    } else {
+        // If not logged in, just serve the index.html with the login button
+        res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+    }
 });
 
 app.get('/login', (req, res) => {
@@ -93,6 +99,7 @@ app.get('/error', (req, res) => {
 });
 
 app.get('/user-info', (req, res) => {
+    // Check if the user is logged in and return session user data
     if (req.session.user) {
         res.json(req.session.user);
     } else {

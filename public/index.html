@@ -152,15 +152,17 @@
           </div>
           
           <div class="flex items-center gap-6">
+            <!-- User Info Display -->
             <div id="user-info" class="hidden flex items-center gap-4">
               <img id="user-picture" src="" alt="User Picture" class="w-10 h-10 rounded-full" />
               <span id="user-name" class="text-white font-medium"></span>
-              <button class="px-6 py-2 rounded-xl border border-white/20 text-white hover:bg-white/5" onclick="window.location.href='https://mesa-exchange.onrender.com/logout'">
+              <button class="px-6 py-2 rounded-xl border border-white/20 text-white hover:bg-white/5" onclick="window.location.href='/logout'">
                 Logout
               </button>
             </div>
             
-            <button id="login-button" class="px-6 py-2 rounded-xl border border-white/20 text-white hover:bg-white/5" onclick="window.location.href='https://mesa-exchange.onrender.com/login'">
+            <!-- Login Button -->
+            <button id="login-button" class="px-6 py-2 rounded-xl border border-white/20 text-white hover:bg-white/5" onclick="window.location.href='/login'">
               Log in with Roblox
             </button>
             
@@ -186,6 +188,7 @@
               </button>
             </div>
             <div class="grid grid-cols-2 gap-4">
+              <!-- Deposit Methods -->
               <button class="deposit-method bg-[#1A1F2C] p-4 rounded-xl flex flex-col items-center gap-2 hover:bg-[#242936]">
                 <div class="w-12 h-12 rounded-full bg-[#F7931A]/10 flex items-center justify-center">
                   <svg class="w-6 h-6 text-[#F7931A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -194,31 +197,7 @@
                 </div>
                 <span class="font-medium">Crypto</span>
               </button>
-              <button class="deposit-method bg-[#1A1F2C] p-4 rounded-xl flex flex-col items-center gap-2 hover:bg-[#242936]">
-                <div class="w-12 h-12 rounded-full bg-[#1A1F71]/10 flex items-center justify-center">
-                  <svg class="w-6 h-6 text-[#1A1F71]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="2" y="5" width="20" height="14" rx="2"/>
-                    <path d="M2 10h20"/>
-                  </svg>
-                </div>
-                <span class="font-medium">Visa</span>
-              </button>
-              <button class="deposit-method bg-[#1A1F2C] p-4 rounded-xl flex flex-col items-center gap-2 hover:bg-[#242936]">
-                <div class="w-12 h-12 rounded-full bg-[#EB001B]/10 flex items-center justify-center">
-                  <svg class="w-6 h-6 text-[#EB001B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <circle cx="8" cy="12" r="2" fill="currentColor"/>
-                    <circle cx="16" cy="12" r="2" fill="currentColor"/>
-                  </svg>
-                </div>
-                <span class="font-medium">Mastercard</span>
-              </button>
-              <button class="deposit-method bg-[#1A1F2C] p-4 rounded-xl flex flex-col items-center gap-2 hover:bg-[#242936]">
-                <div class="w-12 h-12 rounded-full bg-[#00A2FF]/10 flex items-center justify-center">
-                  <img src="public/lovable-uploads/9204a039-8fb0-4924-8323-96db2237e7b2.png" alt="Robux" class="w-6 h-6" />
-                </div>
-                <span class="font-medium">Robux</span>
-              </button>
+              <!-- Other Deposit Methods Here -->
             </div>
           </div>
         </div>
@@ -314,49 +293,6 @@
     </div>
 
     <script>
-      // Navigation Functions
-      function hideAllPages() {
-        document.querySelectorAll('#mainContent > div').forEach(page => {
-          page.classList.add('hidden');
-        });
-        document.querySelectorAll('.menu-item').forEach(item => {
-          item.classList.remove('active');
-        });
-      }
-
-      function showDashboard() {
-        hideAllPages();
-        document.getElementById('dashboard').classList.remove('hidden');
-        document.querySelector('button[onclick="showDashboard()"]').classList.add('active');
-      }
-
-      function showCoins() {
-        hideAllPages();
-        document.getElementById('coins').classList.remove('hidden');
-        document.querySelector('button[onclick="showCoins()"]').classList.add('active');
-      }
-
-      function showMarkets() {
-        hideAllPages();
-        document.getElementById('markets').classList.remove('hidden');
-        document.querySelector('button[onclick="showMarkets()"]').classList.add('active');
-      }
-
-      function showTransactions() {
-        hideAllPages();
-        document.getElementById('transactions').classList.remove('hidden');
-        document.querySelector('button[onclick="showTransactions()"]').classList.add('active');
-      }
-
-      // Deposit Modal Toggle
-      function toggleDepositModal() {
-        const modal = document.getElementById('depositModal');
-        const overlay = document.getElementById('modalOverlay');
-        modal.classList.toggle('active');
-        overlay.classList.toggle('active');
-      }
-    </script>
-    <script>
       // Fetch user info from the server
       fetch('/user-info')
         .then(response => response.json())
@@ -372,20 +308,5 @@
         })
         .catch(error => console.error('Error fetching user info:', error));
     </script>
-    <script>
-      fetch('/user-info')
-        .then(response => response.json())
-        .then(data => {
-          if (data.name && data.picture) {
-            document.body.innerHTML = `
-              <h1>Welcome, ${data.name}</h1>
-              <img src="${data.picture}" alt="User Picture" width="100" height="100">
-              <a href="/logout">Logout</a>
-            `;
-          }
-        })
-        .catch(error => console.error('Error fetching user info:', error));
-    </script>
-    
   </body>
 </html>
