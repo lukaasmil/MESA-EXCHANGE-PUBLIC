@@ -1,366 +1,351 @@
+<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Mesa Exchange Dashboard</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mesa Exchange</title>
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0d1117, #161b22);
-            color: #c9d1d9;
-            overflow: hidden;
-        }
+      :root {
+        --background: 222.2 84% 2%; /* Even darker background */
+        --primary: #00F2A9;
+      }
+      
+      body {
+        background-color: hsl(var(--background));
+        color: white;
+        font-family: system-ui, -apple-system, sans-serif;
+      }
 
-        .nav-item {
-            transition: transform 0.3s, background-color 0.3s;
-        }
+      .glass-card {
+        background: rgba(21, 25, 35, 0.5);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
 
-        .nav-item:hover {
-            transform: translateX(10px);
-            background-color: #21262d;
-        }
+      .deposit-glow {
+        box-shadow: 0 0 20px rgba(0, 242, 169, 0.4);
+        transition: all 0.3s ease;
+      }
 
-        .nav-item.active {
-            background-color: #21262d;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        }
+      .deposit-glow:hover {
+        box-shadow: 0 0 30px rgba(0, 242, 169, 0.6);
+      }
 
-        .balance-card {
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
+      .shield-icon {
+        animation: pulse 2s infinite;
+        filter: drop-shadow(0 0 8px rgba(0, 242, 169, 0.6));
+      }
 
-        .balance-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-        }
+      @keyframes pulse {
+        0% { opacity: 0.8; }
+        50% { opacity: 1; }
+        100% { opacity: 0.8; }
+      }
 
-        .glow-green i {
-            color: #00ff00;
-            text-shadow: 0 0 10px #00ff00;
-        }
+      .deposit-modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+      }
 
-        .deposit-button, .buy-button, .sell-button {
-            background: linear-gradient(90deg, #00cc00, #009900);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: bold;
-            transition: transform 0.3s, box-shadow 0.3s;
-            font-size: 1rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border: none;
-            cursor: pointer;
-        }
+      .deposit-modal.active {
+        display: block;
+      }
 
-        .deposit-button:hover, .buy-button:hover, .sell-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 10px #00ff00;
-        }
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 999;
+      }
 
-        .gradient-button {
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: bold;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
+      .modal-overlay.active {
+        display: block;
+      }
 
-        .gradient-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-        }
+      .deposit-method {
+        transition: all 0.2s ease;
+      }
 
-        .hidden {
-            display: none;
-        }
-
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: #161b22;
-            padding: 2rem;
-            border-radius: 0.5rem;
-            width: 90%;
-            max-width: 500px;
-        }
-
-        .modal-content input,
-        .modal-content select {
-            width: 100%;
-            padding: 0.5rem;
-            margin-top: 1rem;
-            background: #21262d;
-            color: white;
-            border: none;
-            border-radius: 0.5rem;
-        }
-
-        .modal-content button {
-            margin-top: 1rem;
-            width: 100%;
-        }
-
-        .logout-button {
-            color: #ff0000;
-            transition: transform 0.3s, background-color 0.3s;
-        }
-
-        .logout-button:hover {
-            transform: translateX(10px);
-            background-color: #21262d;
-        }
-
-        .social-icons {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: auto;
-            justify-content: flex-start;
-        }
-
-        .admin-username {
-            background: linear-gradient(90deg, #6a00ff, #b400ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .chat-container {
-            flex: 1;
-            overflow-y: auto;
-        }
+      .deposit-method:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 242, 169, 0.2);
+      }
     </style>
-</head>
-<body class="flex h-screen">
-    <!-- Chat Sidebar -->
-    <div class="w-64 bg-[#161b22] p-4 flex flex-col justify-between">
-        <div>
-            <div class="mb-8">
-                <button class="bg-[#21262d] text-white py-2 px-4 rounded-full w-full flex items-center justify-between">
-                    <span>Mesa Exchange</span>
-                </button>
-            </div>
-            <nav class="space-y-4">
-                <a class="nav-item flex items-center text-white py-2 px-4 rounded-lg active" href="#" id="nav-dashboard" onclick="showSection('dashboard')">
-                    <i class="fas fa-th-large mr-3"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a class="nav-item flex items-center py-2 px-4 rounded-lg" href="#" id="nav-my-coins" onclick="showSection('my-coins')">
-                    <i class="fas fa-coins mr-3"></i>
-                    <span>My Coins</span>
-                </a>
-                <a class="nav-item flex items-center py-2 px-4 rounded-lg relative" href="#" id="nav-markets" onclick="showSection('markets')">
-                    <i class="fas fa-chart-line mr-3"></i>
-                    <span>Markets</span>
-                </a>
-                <a class="nav-item flex items-center py-2 px-4 rounded-lg" href="#" id="nav-trading" onclick="showSection('trading')">
-                    <i class="fas fa-exchange-alt mr-3"></i>
-                    <span>Trading</span>
-                </a>
-                <a class="nav-item flex items-center py-2 px-4 rounded-lg" href="#" id="nav-transactions" onclick="showSection('transactions')">
-                    <i class="fas fa-wallet mr-3"></i>
-                    <span>Transactions</span>
-                </a>
-            </nav>
+  </head>
+  <body>
+    <div class="flex min-h-screen">
+      <!-- Sidebar with matched background -->
+      <div class="w-80 h-screen bg-[#0B0F1A] border-r border-white/10 p-6 flex flex-col">
+        <div class="flex items-center gap-3 mb-12">
+          <div class="w-12 h-12 rounded-xl bg-[#00F2A9]/10 flex items-center justify-center">
+            <span class="text-[#00F2A9] font-bold text-xl">M</span>
+          </div>
+          <h1 class="text-2xl font-bold">Mesa Exchange</h1>
         </div>
-        <div class="flex flex-col space-y-4">
-            <div class="social-icons">
-                <div class="glow-green">
-                    <a href="https://discord.gg/NFS6JAPT" target="_blank">
-                        <i class="fab fa-discord text-2xl"></i>
-                    </a>
-                </div>
-                <div class="glow-green">
-                    <i class="fab fa-twitter text-2xl"></i>
-                </div>
-            </div>
-            <a class="logout-button flex items-center py-2 px-4 rounded-lg" href="#">
-                <i class="fas fa-sign-out-alt mr-3"></i>
-                <span>Log Out</span>
-            </a>
+        
+        <nav class="flex-1">
+          <button onclick="showDashboard()" class="menu-item active w-full flex items-center gap-4 px-6 py-4 rounded-xl text-white">
+            <svg class="w-6 h-6 text-[#00F2A9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+              <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+              <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+            </svg>
+            <span class="text-lg">Dashboard</span>
+          </button>
+          <button onclick="showCoins()" class="menu-item w-full flex items-center gap-4 px-6 py-4 rounded-xl text-gray-400 hover:text-white hover:bg-white/5">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="8"></circle>
+              <path d="M9.5 9.5h5v5h-5z"></path>
+            </svg>
+            <span class="text-lg">My Coins</span>
+          </button>
+          <button onclick="showMarkets()" class="menu-item w-full flex items-center gap-4 px-6 py-4 rounded-xl text-gray-400 hover:text-white hover:bg-white/5">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+              <polyline points="16 7 22 7 22 13"></polyline>
+            </svg>
+            <span class="text-lg">Markets</span>
+          </button>
+          <button onclick="showTransactions()" class="menu-item w-full flex items-center gap-4 px-6 py-4 rounded-xl text-gray-400 hover:text-white hover:bg-white/5">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+            <span class="text-lg">Transactions</span>
+          </button>
+        </nav>
+
+        <div class="flex justify-center gap-6 pt-6 border-t border-white/10">
+          <a href="#" class="social-icon p-3 rounded-full glass-card">
+            <svg class="w-6 h-6 text-[#00F2A9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </a>
+          <a href="#" class="social-icon p-3 rounded-full glass-card">
+            <svg class="w-6 h-6 text-[#00F2A9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
+            </svg>
+          </a>
         </div>
-    </div>
-    <!-- Main Content -->
-    <div class="flex-1 p-6 overflow-hidden">
-        <header class="flex items-center justify-between mb-8">
-            <div></div>
-            <div class="flex items-center space-x-4">
-                <div>
-                    <button onclick="window.location.href='https://mesa-exchange.onrender.com/login'">
-                        Log in with Roblox
-                    </button>       
-                </div>
-                <div class="flex items-center space-x-2">
-                    <span class="text-lg font-bold" id="total-balance">$0.00</span>
-                    <button class="deposit-button" onclick="openModal('deposit-modal')">Deposit</button>
-                </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="flex-1 flex flex-col">
+        <!-- Header -->
+        <header class="h-16 border-b border-white/10 flex items-center justify-between px-8">
+          <div class="flex items-center gap-2">
+            <div class="p-2 rounded-full bg-[#00F2A9]/5">
+              <svg class="w-5 h-5 text-[#00F2A9] shield-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
             </div>
-        </header>
-        <main>
-            <div class="bg-gradient-to-r from-[#161b22] to-[#0d1117] p-6 rounded-lg balance-card" id="dashboard">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-2xl font-bold">My Balance</h2>
-                    <div class="flex items-center space-x-2">
-                        <button class="bg-[#21262d] text-white py-1 px-3 rounded-full">24h</button>
-                        <button class="bg-[#21262d] text-white py-1 px-3 rounded-full">
-                            <i class="fas fa-eye-slash"></i>
-                        </button>
-                        <button class="bg-[#21262d] text-white py-1 px-3 rounded-full">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="text-4xl font-bold mb-2" id="balance-amount">$0.00</div>
-                <div class="text-red-500 text-lg font-semibold mb-2" id="balance-change">$0.00 (0.00%)</div>
-                <div class="text-gray-400 text-sm mb-4" id="balance-percentage">0.00% More than last week period</div>
-                <div class="flex space-x-4 mb-6">
-                    <button class="gradient-button buy-button flex items-center justify-center w-full" onclick="openModal('buy-modal')">
-                        <i class="fas fa-arrow-up mr-2"></i>
-                        Buy
-                    </button>
-                    <button class="gradient-button sell-button flex items-center justify-center w-full" onclick="openModal('sell-modal')">
-                        <i class="fas fa-arrow-down mr-2"></i>
-                        Sell
-                    </button>
-                </div>
-                <div class="bg-[#21262d] p-4 rounded-lg">
-                    <h3 class="text-xl font-bold mb-2">My Portfolio</h3>
-                    <div class="text-gray-400 text-sm">Detailed view of your assets and performance.</div>
-                </div>
-            </div>
-            <div class="hidden bg-gradient-to-r from-[#161b22] to-[#0d1117] p-6 rounded-lg" id="my-coins">
-                <h2 class="text-2xl font-bold mb-4">My Coins</h2>
-                <ul class="space-y-4">
-                    <li class="bg-[#21262d] p-4 rounded-lg flex justify-between items-center">
-                        <span>Bitcoin (BTC)</span>
-                        <span>1.234 BTC</span>
-                    </li>
-                    <li class="bg-[#21262d] p-4 rounded-lg flex justify-between items-center">
-                        <span>Ethereum (ETH)</span>
-                        <span>10.567 ETH</span>
-                    </li>
-                    <li class="bg-[#21262d] p-4 rounded-lg flex justify-between items-center">
-                        <span>Litecoin (LTC)</span>
-                        <span>50.789 LTC</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="hidden bg-gradient-to-r from-[#161b22] to-[#0d1117] p-6 rounded-lg" id="markets">
-                <h2 class="text-2xl font-bold mb-4">Markets</h2>
-                <p class="text-gray-400">Market data will be displayed here.</p>
-            </div>
-            <div class="hidden bg-gradient-to-r from-[#161b22] to-[#0d1117] p-6 rounded-lg" id="trading">
-                <h2 class="text-2xl font-bold mb-4">Trading</h2>
-                <p class="text-gray-400">Trading interface will be displayed here.</p>
-            </div>
-            <div class="hidden bg-gradient-to-r from-[#161b22] to-[#0d1117] p-6 rounded-lg" id="transactions">
-                <h2 class="text-2xl font-bold mb-4">Transactions</h2>
-                <p class="text-gray-400">Transaction history will be displayed here.</p>
-            </div>
-        </main>
-    </div>
-    <!-- Chat Sidebar -->
-    <div class="w-64 bg-[#161b22] p-4 flex flex-col justify-between">
-        <div class="chat-container space-y-4" id="chat-messages">
-            <!-- Chat messages will be appended here -->
-        </div>
-        <div class="flex items-center space-x-2">
-            <input class="bg-[#21262d] text-white py-2 px-4 rounded-full w-full" placeholder="Type a message..." type="text" id="chat-input" onkeydown="if(event.key === 'Enter') sendMessage()"/>
-            <button class="bg-[#00cc00] text-white py-2 px-4 rounded-full" onclick="sendMessage()">
-                <i class="fas fa-paper-plane"></i>
+          </div>
+          
+          <div class="flex items-center gap-6">
+            <button class="px-6 py-2 rounded-xl border border-white/20 text-white hover:bg-white/5" onclick="window.location.href='https://mesa-exchange.onrender.com/login'">
+              Log in with Roblox
             </button>
-        </div>
-    </div>
-    <!-- Deposit Modal -->
-    <div class="modal hidden" id="deposit-modal">
-        <div class="modal-content">
-            <h2 class="text-2xl font-bold mb-4">Deposit Funds</h2>
-            <div class="flex justify-around mb-4">
-                <button class="deposit-button" onclick="selectPaymentMethod('credit-card')">
-                    <i class="fas fa-credit-card"></i>
-                </button>
-                <button class="deposit-button" onclick="selectPaymentMethod('paypal')">
-                    <i class="fab fa-paypal"></i>
-                </button>
-                <button class="deposit-button" onclick="selectPaymentMethod('crypto')">
-                    <i class="fas fa-coins"></i>
-                </button>
-                <button class="deposit-button" onclick="selectPaymentMethod('robux')">
-                    <i class="fas fa-robot"></i>
-                </button>
+            <div class="px-6 py-2 rounded-xl glass-card">
+              <span class="text-gray-400">$</span>
+              <span class="ml-1">0.00</span>
             </div>
-            <label for="deposit-amount">Amount</label>
-            <input id="deposit-amount" placeholder="Enter amount" type="number"/>
-            <button class="deposit-button" onclick="depositFunds()">Deposit</button>
-            <button class="deposit-button bg-red-600 mt-2" onclick="closeModal('deposit-modal')">Cancel</button>
+            <button onclick="toggleDepositModal()" class="deposit-glow bg-[#00F2A9] text-black hover:bg-[#00F2A9]/90 rounded-xl px-6 py-2">
+              Deposit
+            </button>
+          </div>
+        </header>
+
+        <!-- Deposit Modal -->
+        <div id="depositModal" class="deposit-modal">
+          <div class="bg-[#151923] rounded-xl p-6 w-[400px]">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-xl font-bold">Select Deposit Method</h3>
+              <button onclick="toggleDepositModal()" class="text-gray-400 hover:text-white">
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <button class="deposit-method bg-[#1A1F2C] p-4 rounded-xl flex flex-col items-center gap-2 hover:bg-[#242936]">
+                <div class="w-12 h-12 rounded-full bg-[#F7931A]/10 flex items-center justify-center">
+                  <svg class="w-6 h-6 text-[#F7931A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894m-1.216 6.894L5 17.999m6.767 1.09l-.002-.001m0 0c-4.924-.868-6.14 6.025-1.216 6.894m1.216-6.894l6.767 1.09"/>
+                  </svg>
+                </div>
+                <span class="font-medium">Crypto</span>
+              </button>
+              <button class="deposit-method bg-[#1A1F2C] p-4 rounded-xl flex flex-col items-center gap-2 hover:bg-[#242936]">
+                <div class="w-12 h-12 rounded-full bg-[#1A1F71]/10 flex items-center justify-center">
+                  <svg class="w-6 h-6 text-[#1A1F71]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="5" width="20" height="14" rx="2"/>
+                    <path d="M2 10h20"/>
+                  </svg>
+                </div>
+                <span class="font-medium">Visa</span>
+              </button>
+              <button class="deposit-method bg-[#1A1F2C] p-4 rounded-xl flex flex-col items-center gap-2 hover:bg-[#242936]">
+                <div class="w-12 h-12 rounded-full bg-[#EB001B]/10 flex items-center justify-center">
+                  <svg class="w-6 h-6 text-[#EB001B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <circle cx="8" cy="12" r="2" fill="currentColor"/>
+                    <circle cx="16" cy="12" r="2" fill="currentColor"/>
+                  </svg>
+                </div>
+                <span class="font-medium">Mastercard</span>
+              </button>
+              <button class="deposit-method bg-[#1A1F2C] p-4 rounded-xl flex flex-col items-center gap-2 hover:bg-[#242936]">
+                <div class="w-12 h-12 rounded-full bg-[#00A2FF]/10 flex items-center justify-center">
+                  <img src="public/lovable-uploads/9204a039-8fb0-4924-8323-96db2237e7b2.png" alt="Robux" class="w-6 h-6" />
+                </div>
+                <span class="font-medium">Robux</span>
+              </button>
+            </div>
+          </div>
         </div>
-    </div>
-    <script>
-        const currentUser = 'admin'; // Change this to simulate different users
+        <div id="modalOverlay" class="modal-overlay" onclick="toggleDepositModal()"></div>
 
-        function showSection(sectionId) {
-            const sections = document.querySelectorAll('main > div');
-            sections.forEach(section => {
-                section.classList.add('hidden');
-            });
-            document.getElementById(sectionId).classList.remove('hidden');
-        }
+        <!-- Dashboard Content -->
+        <div id="mainContent" class="flex-1 p-6">
+          <div id="dashboard">
+            <div class="mb-12">
+              <div class="flex items-center justify-between mb-8">
+                <div>
+                  <h2 class="text-3xl font-bold mb-2">Total Balance</h2>
+                  <div class="text-5xl font-bold">$0.00</div>
+                  <div class="mt-2 px-3 py-1 rounded-full bg-[#FF4B4B]/10 text-[#FF4B4B] text-sm inline-block">
+                    $0.00 (0%)
+                  </div>
+                </div>
+                <div class="flex gap-4">
+                  <button class="bg-[#00F2A9]/10 text-[#00F2A9] hover:bg-[#00F2A9]/20 px-8 py-2 rounded-xl border border-[#00F2A9]/20">
+                    Buy
+                  </button>
+                  <button class="border border-white/10 hover:bg-white/5 px-8 py-2 rounded-xl">
+                    Sell
+                  </button>
+                </div>
+              </div>
+            </div>
 
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.remove('hidden');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-        }
-
-        function depositFunds() {
-            const amount = parseFloat(document.getElementById('deposit-amount').value);
-            if (!isNaN(amount) && amount > 0) {
-                const totalBalanceElement = document.getElementById('total-balance');
-                const balanceAmountElement = document.getElementById('balance-amount');
-                const currentBalance = parseFloat(totalBalanceElement.textContent.replace('$', ''));
-                const newBalance = currentBalance + amount;
-                totalBalanceElement.textContent = `$${newBalance.toFixed(2)}`;
-                balanceAmountElement.textContent = `$${newBalance.toFixed(2)}`;
-                closeModal('deposit-modal');
-            }
-        }
-
-        function selectPaymentMethod(method) {
-            console.log(`Selected payment method: ${method}`);
-        }
-
-        function sendMessage() {
-            const chatInput = document.getElementById('chat-input');
-            const message = chatInput.value.trim();
-            if (message) {
-                const chatMessages = document.getElementById('chat-messages');
-                const messageElement = document.createElement('div');
-                messageElement.classList.add('bg-[#21262d]', 'p-4', 'rounded-lg', 'mb-4');
-                messageElement.innerHTML = `
-                    <div class="flex items-center mb-2">
-                        <div class="rounded-full bg-gray-400 mr-2" style="height: 30px; width: 30px;"></div>
-                        <span class="font-bold ${currentUser === 'admin' ? 'text-green-500' : 'text-gray-400'}">${currentUser}</span>
+            <div>
+              <h2 class="text-2xl font-bold mb-2">Dashboard Overview</h2>
+              <p class="text-gray-400 mb-6">Your crypto portfolio at a glance</p>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-card rounded-xl p-6">
+                  <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-[#00F2A9]/5 flex items-center justify-center text-[#00F2A9]">
+                      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                      </svg>
                     </div>
-                    <div>${message}</div>
-                `;
-                chatMessages.appendChild(messageElement);
-                chatInput.value = '';
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-        }
+                    <div>
+                      <h3 className="text-gray-400 text-sm">Total Balance</h3>
+                      <p className="text-2xl font-bold">$0.00</p>
+                    </div>
+                  </div>
+                  <div class="text-[#FF4B4B] text-sm">0%</div>
+                </div>
+
+                <div class="glass-card rounded-xl p-6">
+                  <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-[#00F2A9]/5 flex items-center justify-center text-[#00F2A9]">
+                      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-gray-400 text-sm">24h Volume</h3>
+                      <p className="text-2xl font-bold">$0.00</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- My Coins Page (Hidden by default) -->
+          <div id="coins" class="hidden">
+            <h2 class="text-3xl font-bold mb-6">My Coins</h2>
+            <div class="glass-card rounded-xl p-6">
+              <p class="text-gray-400">No coins in your portfolio yet.</p>
+            </div>
+          </div>
+
+          <!-- Markets Page (Hidden by default) -->
+          <div id="markets" class="hidden">
+            <h2 class="text-3xl font-bold mb-6">Markets</h2>
+            <div class="glass-card rounded-xl p-6">
+              <p class="text-gray-400">Market data loading...</p>
+            </div>
+          </div>
+
+          <!-- Transactions Page (Hidden by default) -->
+          <div id="transactions" class="hidden">
+            <h2 class="text-3xl font-bold mb-6">Transactions</h2>
+            <div class="glass-card rounded-xl p-6">
+              <p class="text-gray-400">No transactions yet.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Navigation Functions
+      function hideAllPages() {
+        document.querySelectorAll('#mainContent > div').forEach(page => {
+          page.classList.add('hidden');
+        });
+        document.querySelectorAll('.menu-item').forEach(item => {
+          item.classList.remove('active');
+        });
+      }
+
+      function showDashboard() {
+        hideAllPages();
+        document.getElementById('dashboard').classList.remove('hidden');
+        document.querySelector('button[onclick="showDashboard()"]').classList.add('active');
+      }
+
+      function showCoins() {
+        hideAllPages();
+        document.getElementById('coins').classList.remove('hidden');
+        document.querySelector('button[onclick="showCoins()"]').classList.add('active');
+      }
+
+      function showMarkets() {
+        hideAllPages();
+        document.getElementById('markets').classList.remove('hidden');
+        document.querySelector('button[onclick="showMarkets()"]').classList.add('active');
+      }
+
+      function showTransactions() {
+        hideAllPages();
+        document.getElementById('transactions').classList.remove('hidden');
+        document.querySelector('button[onclick="showTransactions()"]').classList.add('active');
+      }
+
+      // Deposit Modal Toggle
+      function toggleDepositModal() {
+        const modal = document.getElementById('depositModal');
+        const overlay = document.getElementById('modalOverlay');
+        modal.classList.toggle('active');
+        overlay.classList.toggle('active');
+      }
     </script>
-</body>
+  </body>
 </html>
