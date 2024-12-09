@@ -107,7 +107,7 @@ app.listen(port, () => {
 
 const corsOptions = {
     origin: ['https://mesa-exchange.onrender.com', 'https://mesacrypto.com'],
-    credentials: true, 
+    credentials: true, // Allow cookies to be sent with requests
     optionsSuccessStatus: 200
 };
 
@@ -115,16 +115,14 @@ app.use(cors(corsOptions));
 
 
 app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
+    secret: process.env.SESSION_SECRET, 
+    resave: false,s
     saveUninitialized: true,
     cookie: {
-        secure: true,         
-        httpOnly: true,    
-        sameSite: 'none',  
-        domain: '.mesacrypto.com',
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 dni
+        secure: true,         // Use HTTPS
+        httpOnly: true,       // Protects against XSS
+        sameSite: 'none',     // Allows cookies to be shared across different domains
+        domain: '.mesacrypto.com', // Makes the cookie available to mesacrypto.com and subdomains
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     }
 }));
-
-

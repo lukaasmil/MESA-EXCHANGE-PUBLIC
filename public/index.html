@@ -156,17 +156,13 @@
             <div id="user-info" class="hidden flex items-center gap-4">
               <img id="user-picture" src="" alt="User Picture" class="w-10 h-10 rounded-full" />
               <span id="user-name" class="text-white font-medium"></span>
-              <button class="px-6 py-2 rounded-xl border border-white/20 text-white hover:bg-white/5" onclick="window.location.href='/logout'">
-                Logout
+              <button class="px-6 py-2 rounded-xl border border-white/20 text-white hover:bg-white/5" onclick="window.location.href='https://mesa-exchange.onrender.com/logout'">
+                  Logout
               </button>
-            </div>
-            
-            <!-- Login Button -->
-            <button id="login-button" class="px-6 py-2 rounded-xl border border-white/20 text-white hover:bg-white/5" onclick="window.location.assign('https://mesa-exchange.onrender.com/login')">
+          </div>
+          <button id="login-button" class="px-6 py-2 rounded-xl border border-white/20 text-white hover:bg-white/5" onclick="window.location.href='https://mesa-exchange.onrender.com/login'">
               Log in with Roblox
-            </button>
-            
-            
+          </button>
             <div class="px-6 py-2 rounded-xl glass-card">
               <span class="text-gray-400">$</span>
               <span class="ml-1">0.00</span>
@@ -311,69 +307,21 @@
     </script>
     <script>
       // Fetch user info from the server
-      fetch('/user-info', { credentials: 'include' })
+      fetch('https://mesa-exchange.onrender.com/user-info', {
+          credentials: 'include' // Send cookies with the request
+      })
         .then(response => response.json())
         .then(data => {
-          if (data.name && data.picture) {
-            document.getElementById('user-name').textContent = data.name;
-            document.getElementById('user-picture').src = data.picture;
+            if (data.name && data.picture) {
+                document.getElementById('user-name').textContent = data.name;
+                document.getElementById('user-picture').src = data.picture;
     
-            // Show user info and hide login button
-            document.getElementById('user-info').classList.remove('hidden');
-            document.getElementById('login-button').classList.add('hidden');
-          }
+                // Show user info and hide login button
+                document.getElementById('user-info').classList.remove('hidden');
+                document.getElementById('login-button').classList.add('hidden');
+            }
         })
         .catch(error => console.error('Error fetching user info:', error));
-    </script>
-
- <script>
-      // Navigation Functions
-      function hideAllPages() {
-        document.querySelectorAll('#mainContent > div').forEach(page => {
-          page.classList.add('hidden');
-        });
-        document.querySelectorAll('.menu-item').forEach(item => {
-          item.classList.remove('active');
-        });
-      }
-
-      function showDashboard() {
-        hideAllPages();
-        document.getElementById('dashboard').classList.remove('hidden');
-        document.querySelector('button[onclick="showDashboard()"]').classList.add('active');
-      }
-
-      function showCoins() {
-        hideAllPages();
-        document.getElementById('coins').classList.remove('hidden');
-        document.querySelector('button[onclick="showCoins()"]').classList.add('active');
-      }
-
-      function showMarkets() {
-        hideAllPages();
-        document.getElementById('markets').classList.remove('hidden');
-        document.querySelector('button[onclick="showMarkets()"]').classList.add('active');
-      }
-
-      function showTransactions() {
-        hideAllPages();
-        document.getElementById('transactions').classList.remove('hidden');
-        document.querySelector('button[onclick="showTransactions()"]').classList.add('active');
-      }
-
-      // Deposit Modal Toggle
-      function toggleDepositModal() {
-        const modal = document.getElementById('depositModal');
-        const overlay = document.getElementById('modalOverlay');
-        modal.classList.toggle('active');
-        overlay.classList.toggle('active');
-      }
-    </script>
-  </body>
-</html>
-
-
-
-    
+    </script>  
   </body>
 </html>
