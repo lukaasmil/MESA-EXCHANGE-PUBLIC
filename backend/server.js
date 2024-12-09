@@ -4,35 +4,30 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const session = require('express-session');
-const path = require('path'); // Ensure 'path' is at the top
+const path = require('path'); 
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 const port = process.env.PORT || 3000;
 
-// Session setup
 app.use(session({
-    secret: process.env.SESSION_SECRET, // Replace with a strong secret key
+    secret: process.env.SESSION_SECRET, 
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false } // Set secure: true in production if using HTTPS
+    cookie: { secure: false } 
 }));
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
-// Serve static files from the 'public' directory in the root of the project
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-// Serve the index.html file after login
 app.get('/', (req, res) => {
-    // Check if the user is logged in
     if (req.session.user) {
         res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
     } else {
-        // If not logged in, just serve the index.html with the login button
         res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
     }
 });
@@ -69,7 +64,7 @@ app.get('/callback', async (req, res) => {
 
         console.log('User Data:', userResponse.data);
 
-        // Save user data in session
+    
         req.session.user = {
             name: userResponse.data.name,
             picture: userResponse.data.picture,
@@ -99,7 +94,6 @@ app.get('/error', (req, res) => {
 });
 
 app.get('/user-info', (req, res) => {
-    // Check if the user is logged in and return session user data
     if (req.session.user) {
         res.json(req.session.user);
     } else {
@@ -116,3 +110,15 @@ const corsOptions = {
     optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
+
+app.use(session({
+    secret: process.env.SESSION_SECRET, 
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        secure: true,       
+        httpOnly: true,     
+        maxAge: 7 * 24 * 60 * 60 * 1000
+    }
+}));
+
