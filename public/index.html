@@ -325,6 +325,55 @@
         })
         .catch(error => console.error('Error fetching user info:', error));
     </script>
+
+ <script>
+      // Navigation Functions
+      function hideAllPages() {
+        document.querySelectorAll('#mainContent > div').forEach(page => {
+          page.classList.add('hidden');
+        });
+        document.querySelectorAll('.menu-item').forEach(item => {
+          item.classList.remove('active');
+        });
+      }
+
+      function showDashboard() {
+        hideAllPages();
+        document.getElementById('dashboard').classList.remove('hidden');
+        document.querySelector('button[onclick="showDashboard()"]').classList.add('active');
+      }
+
+      function showCoins() {
+        hideAllPages();
+        document.getElementById('coins').classList.remove('hidden');
+        document.querySelector('button[onclick="showCoins()"]').classList.add('active');
+      }
+
+      function showMarkets() {
+        hideAllPages();
+        document.getElementById('markets').classList.remove('hidden');
+        document.querySelector('button[onclick="showMarkets()"]').classList.add('active');
+      }
+
+      function showTransactions() {
+        hideAllPages();
+        document.getElementById('transactions').classList.remove('hidden');
+        document.querySelector('button[onclick="showTransactions()"]').classList.add('active');
+      }
+
+      // Deposit Modal Toggle
+      function toggleDepositModal() {
+        const modal = document.getElementById('depositModal');
+        const overlay = document.getElementById('modalOverlay');
+        modal.classList.toggle('active');
+        overlay.classList.toggle('active');
+      }
+    </script>
+  </body>
+</html>
+
+
+
     
   </body>
 </html>
