@@ -99,6 +99,7 @@
         </div>
         
         <nav class="flex-1">
+          <!-- Dashboard Button -->
           <button onclick="showDashboard()" class="menu-item active w-full flex items-center gap-4 px-6 py-4 rounded-xl text-white">
             <svg class="w-6 h-6 text-[#00F2A9]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="3" width="7" height="7" rx="1"></rect>
@@ -108,6 +109,8 @@
             </svg>
             <span class="text-lg">Dashboard</span>
           </button>
+          
+          <!-- My Coins Button -->
           <button onclick="showCoins()" class="menu-item w-full flex items-center gap-4 px-6 py-4 rounded-xl text-gray-400 hover:text-white hover:bg-white/5">
             <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="8"></circle>
@@ -115,6 +118,8 @@
             </svg>
             <span class="text-lg">My Coins</span>
           </button>
+
+          <!-- Markets Button -->
           <button onclick="showMarkets()" class="menu-item w-full flex items-center gap-4 px-6 py-4 rounded-xl text-gray-400 hover:text-white hover:bg-white/5">
             <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
@@ -122,6 +127,8 @@
             </svg>
             <span class="text-lg">Markets</span>
           </button>
+
+          <!-- Transactions Button -->
           <button onclick="showTransactions()" class="menu-item w-full flex items-center gap-4 px-6 py-4 rounded-xl text-gray-400 hover:text-white hover:bg-white/5">
             <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
@@ -199,7 +206,15 @@
                 </div>
                 <span class="font-medium">Crypto</span>
               </button>
-              <!-- Other Deposit Methods Here -->
+              <!-- Additional Deposit Methods -->
+              <button class="deposit-method bg-[#1A1F2C] p-4 rounded-xl flex flex-col items-center gap-2 hover:bg-[#242936]">
+                <div class="w-12 h-12 rounded-full bg-[#1A73E8]/10 flex items-center justify-center">
+                  <svg class="w-6 h-6 text-[#1A73E8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 12c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8zM12 2c5.52 0 10 4.48 10 10s-4.48 10-10 10-10-4.48-10-10S6.48 2 12 2z"/>
+                  </svg>
+                </div>
+                <span class="font-medium">Bank Transfer</span>
+              </button>
             </div>
           </div>
         </div>
