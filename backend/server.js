@@ -4,49 +4,37 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const session = require('express-session');
-const path = require('path');
+const path = require('path'); 
 
 const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
 const port = process.env.PORT || 3000;
 
-// Middleware setup
-app.use(bodyParser.urlencoded({ extended: true }));
-
-const corsOptions = {
-    origin: ['https://mesa-exchange.onrender.com', 'https://mesacrypto.com'],
-    credentials: true,
-    optionsSuccessStatus: 200,
-};
-
-app.use(cors(corsOptions));
-
-// Session configuration
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET, 
     resave: false,
     saveUninitialized: true,
-    cookie: {
-        secure: true,
-        httpOnly: true,
-        sameSite: 'none',
-        domain: '.mesacrypto.com',
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    },
+    cookie: { secure: false } 
 }));
-
-// Static file serving
-app.use(express.static(path.join(__dirname, '..', 'public')));
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
+app.use(express.static(path.join(__dirname, '..', 'public')));
+
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+    if (req.session.user) {
+        res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+    } else {
+        res.sendFile(path.join(__dirname, '..', 'public', 'index.html'));
+    }
 });
 
 app.get('/login', (req, res) => {
     const authURL = `https://apis.roblox.com/oauth/v1/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=openid%20profile`;
+
     console.log('Redirecting to:', authURL);
     res.redirect(authURL);
 });
@@ -60,6 +48,7 @@ app.get('/callback', async (req, res) => {
 
     try {
         const params = new URLSearchParams();
+
         params.append('grant_type', 'authorization_code');
         params.append('code', code);
         params.append('redirect_uri', REDIRECT_URI);
@@ -75,13 +64,14 @@ app.get('/callback', async (req, res) => {
 
         console.log('User Data:', userResponse.data);
 
+    
         req.session.user = {
             name: userResponse.data.name,
             picture: userResponse.data.picture,
         };
 
-        console.log('Redirecting to mesacrypto.com after successful login');
-        res.redirect('https://mesacrypto.com');
+        console.log('Redirecting to / after successful login');
+        res.redirect('/');
     } catch (error) {
         console.error('Error during OAuth exchange:', error.response ? error.response.data : error);
         res.redirect(`/error?message=${encodeURIComponent('Failed to authenticate')}`);
@@ -94,7 +84,7 @@ app.get('/logout', (req, res) => {
             console.error('Error during logout:', err);
             res.send('Error logging out');
         } else {
-            res.redirect('https://mesacrypto.com');
+            res.redirect('/');
         }
     });
 });
@@ -114,3 +104,27 @@ app.get('/user-info', (req, res) => {
 app.listen(port, () => {
     console.log(`Backend running on http://localhost:${port}`);
 });
+
+const corsOptions = {
+    origin: ['https://mesa-exchange.onrender.com', 'https://mesacrypto.com'],
+    credentials: true, 
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        secure: true,         
+        httpOnly: true,    
+        sameSite: 'none',  
+        domain: '.mesacrypto.com',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 dni
+    }
+}));
+
+
