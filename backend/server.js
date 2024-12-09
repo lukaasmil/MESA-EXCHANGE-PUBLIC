@@ -113,10 +113,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-
 app.use(session({
-    secret: process.env.SESSION_SECRET, 
-    resave: false,s
+    secret: process.env.SESSION_SECRET, // Ensure this environment variable is set
+    resave: false,
     saveUninitialized: true,
     cookie: {
         secure: true,         // Use HTTPS
