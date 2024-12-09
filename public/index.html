@@ -309,5 +309,22 @@
         })
         .catch(error => console.error('Error fetching user info:', error));
     </script>
+    <script>
+      // Fetch user info from the server
+      fetch('/user-info', { credentials: 'include' })
+        .then(response => response.json())
+        .then(data => {
+          if (data.name && data.picture) {
+            document.getElementById('user-name').textContent = data.name;
+            document.getElementById('user-picture').src = data.picture;
+    
+            // Show user info and hide login button
+            document.getElementById('user-info').classList.remove('hidden');
+            document.getElementById('login-button').classList.add('hidden');
+          }
+        })
+        .catch(error => console.error('Error fetching user info:', error));
+    </script>
+    
   </body>
 </html>

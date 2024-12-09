@@ -9,30 +9,32 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Middleware setup
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const corsOptions = {
     origin: ['https://mesa-exchange.onrender.com', 'https://mesacrypto.com'],
-    credentials: true, 
+    credentials: true,
     optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
 
-
+// Session configuration
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
-        secure: true,          // Use HTTPS
-        httpOnly: true,        // Protect against XSS
-        sameSite: 'none',      // Allow cross-site cookies
-        domain: '.mesacrypto.com', // Apply to custom domain
+        secure: true,
+        httpOnly: true,
+        sameSite: 'none',
+        domain: '.mesacrypto.com',
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     },
 }));
 
+// Static file serving
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 const CLIENT_ID = process.env.CLIENT_ID;
