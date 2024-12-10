@@ -137,27 +137,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
-app.get('/get-robux-balance', authenticateJWT, async (req, res) => {
-    try {
-      const userId = req.user.userId;
-      const accessToken = req.user.accessToken;
   
-      const response = await axios.get(`https://economy.roblox.com/v1/users/${userId}/currency`, {
-        params: { access_token: accessToken },
-      });
-  
-      console.log('Robux balance fetched:', response.data); // Debugging line
-  
-      res.json({ robux: response.data.robux });
-    } catch (error) {
-      console.error('Error fetching Robux balance:', error);
-      res.status(500).json({ error: 'Failed to fetch Robux balance' });
-    }
-  });
-  
-  
-
   app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
   });
