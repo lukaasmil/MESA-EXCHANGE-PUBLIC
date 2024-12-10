@@ -54,7 +54,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-    const authURL = `https://apis.roblox.com/oauth/v1/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=openid%20profile%20economy`;
+    const authURL = `https://apis.roblox.com/oauth/v1/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=openid%20profile%20assets:read`;
   
     console.log('Redirecting to:', authURL);
     res.redirect(authURL);
