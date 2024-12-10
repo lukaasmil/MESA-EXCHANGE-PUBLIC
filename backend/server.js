@@ -63,50 +63,56 @@ app.get('/login', (req, res) => {
 // Callback Route - Exchange Authorization Code for Access Token
 app.get('/callback', async (req, res) => {
     const code = String(req.query.code);
-
+  
     if (!code) {
-        return res.redirect(`/error?message=${encodeURIComponent('Authorization code not provided')}`);
+      return res.redirect(`/error?message=${encodeURIComponent('Authorization code not provided')}`);
     }
-
+  
     try {
-        const params = new URLSearchParams();
-
-        params.append('grant_type', 'authorization_code');
-        params.append('code', code);
-        params.append('redirect_uri', REDIRECT_URI);
-        params.append('client_id', CLIENT_ID);
-        params.append('client_secret', CLIENT_SECRET);
-
-        const tokenResponse = await axios.post('https://apis.roblox.com/oauth/v1/token', params);
-        const accessToken = tokenResponse.data.access_token;
-
-        const userResponse = await axios.get('https://apis.roblox.com/oauth/v1/userinfo', {
-            headers: { Authorization: `Bearer ${accessToken}` },
-        });
-
-        console.log('User Data:', userResponse.data);
-
-        // Create JWT token
-        const token = jwt.sign(
-            { name: userResponse.data.name, picture: userResponse.data.picture },
-            JWT_SECRET,
-            { expiresIn: '7d' } // Set token expiration to 7 days
-        );
-
-        // Send JWT token as an HTTP-only cookie
-        res.cookie('authToken', token, {
-            httpOnly: true, // Make sure the cookie is secure and not accessible via JavaScript
-            secure: true,   // Ensure cookie is sent only over HTTPS
-            sameSite: 'None', // Allow cross-domain cookies
-            maxAge: 7 * 24 * 60 * 60 * 1000 // Cookie expiration time (7 days)
-        });
-
-        res.redirect('/');
+      const params = new URLSearchParams();
+  
+      params.append('grant_type', 'authorization_code');
+      params.append('code', code);
+      params.append('redirect_uri', REDIRECT_URI);
+      params.append('client_id', CLIENT_ID);
+      params.append('client_secret', CLIENT_SECRET);
+  
+      const tokenResponse = await axios.post('https://apis.roblox.com/oauth/v1/token', params);
+      const accessToken = tokenResponse.data.access_token;
+  
+      const userResponse = await axios.get('https://apis.roblox.com/oauth/v1/userinfo', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+  
+      console.log('User Data:', userResponse.data);
+  
+      // Create JWT token with userId and accessToken
+      const token = jwt.sign(
+        { 
+          userId: userResponse.data.sub,  // Assuming 'sub' contains the user ID
+          name: userResponse.data.name, 
+          picture: userResponse.data.picture, 
+          accessToken: accessToken 
+        },
+        JWT_SECRET,
+        { expiresIn: '7d' } // Set token expiration to 7 days
+      );
+  
+      // Send JWT token as an HTTP-only cookie
+      res.cookie('authToken', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'None',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      });
+  
+      res.redirect('/');
     } catch (error) {
-        console.error('Error during OAuth exchange:', error.response ? error.response.data : error);
-        res.redirect(`/error?message=${encodeURIComponent('Failed to authenticate')}`);
+      console.error('Error during OAuth exchange:', error.response ? error.response.data : error);
+      res.redirect(`/error?message=${encodeURIComponent('Failed to authenticate')}`);
     }
-});
+  });
+  
 
 // Logout Route - Clear JWT Cookie
 app.get('/logout', (req, res) => {
