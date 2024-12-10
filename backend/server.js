@@ -53,13 +53,13 @@ app.get('/', (req, res) => {
     }
 });
 
-// Login Route (Redirect to Roblox OAuth)
 app.get('/login', (req, res) => {
-    const authURL = `https://apis.roblox.com/oauth/v1/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=openid%20profile`;
+    const authURL = `https://apis.roblox.com/oauth/v1/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=openid%20profile%20economy`;
+  
     console.log('Redirecting to:', authURL);
     res.redirect(authURL);
-});
-
+  });
+  
 // Callback Route - Exchange Authorization Code for Access Token
 app.get('/callback', async (req, res) => {
     const code = String(req.query.code);
@@ -147,15 +147,16 @@ app.get('/get-robux-balance', authenticateJWT, async (req, res) => {
         params: { access_token: accessToken },
       });
   
-      console.log('Robux balance fetched:', response.data);
+      console.log('Robux balance fetched:', response.data); // Debugging line
   
       res.json({ robux: response.data.robux });
     } catch (error) {
       console.error('Error fetching Robux balance:', error);
       res.status(500).json({ error: 'Failed to fetch Robux balance' });
     }
-  });  
+  });
   
+
   app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
   });
