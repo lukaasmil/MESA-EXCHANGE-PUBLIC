@@ -141,6 +141,8 @@ app.get('/get-robux-balance', authenticateJWT, async (req, res) => {
         params: { access_token: accessToken },
       });
   
+      console.log('Robux balance fetched:', response.data);
+  
       res.json({ robux: response.data.robux });
     } catch (error) {
       console.error('Error fetching Robux balance:', error);

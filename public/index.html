@@ -345,16 +345,19 @@
         overlay.classList.toggle('active');
       }
 
+  // Function to fetch Robux balance
   function fetchRobuxBalance() {
     fetch('/get-robux-balance', {
-      credentials: 'include', 
+      credentials: 'include', // Ensure cookies (JWT) are sent with the request
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log('Robux balance data:', data); // Debugging statement
+
         if (data.robux !== undefined) {
           document.getElementById('robux-amount').textContent = `${data.robux} Robux`;
         } else {
-          document.getElementById('robux-amount').textContent = 'Failed to fetch balance';
+          document.getElementById('robux-amount').textContent = '0 Robux';
         }
       })
       .catch((error) => {
@@ -362,8 +365,46 @@
         document.getElementById('robux-amount').textContent = 'Error fetching balance';
       });
   }
-  fetchRobuxBalance();
-
     </script>
+    <script>
+      // Function to fetch Robux balance
+      function fetchRobuxBalance() {
+        fetch('/get-robux-balance', {
+          credentials: 'include', // Ensure cookies (JWT) are sent with the request
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log('Robux balance data:', data); // Debugging statement
+    
+            if (data.robux !== undefined) {
+              document.getElementById('robux-amount').textContent = `${data.robux} Robux`;
+            } else {
+              document.getElementById('robux-amount').textContent = '0 Robux';
+            }
+          })
+          .catch((error) => {
+            console.error('Error fetching Robux balance:', error);
+            document.getElementById('robux-amount').textContent = 'Error fetching balance';
+          });
+      }
+    
+      // Call fetchRobuxBalance after the user logs in
+      fetch('/user-info', { credentials: 'include' })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.name && data.picture) {
+            document.getElementById('user-name').textContent = data.name;
+            document.getElementById('user-picture').src = data.picture;
+    
+            // Show user info and hide login button
+            document.getElementById('user-info').classList.remove('hidden');
+            document.getElementById('login-button').classList.add('hidden');
+    
+            // Fetch Robux balance after user info is loaded
+            fetchRobuxBalance();
+          }
+        })
+        .catch((error) => console.error('Error fetching user info:', error));
+    </script>    
   </body>
 </html>
