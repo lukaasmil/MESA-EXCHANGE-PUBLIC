@@ -175,10 +175,10 @@
           <button id="login-button" class="px-6 py-2 rounded-xl border border-white/20 text-white hover:bg-white/5" onclick="window.location.href='https://mesa-exchange.onrender.com/login'">
               Log in with Roblox
           </button>
-            <div class="px-6 py-2 rounded-xl glass-card">
-              <span class="text-gray-400">$</span>
-              <span class="ml-1">0.00</span>
-            </div>
+          <div class="px-6 py-2 rounded-xl glass-card">
+            <span class="text-gray-400">Robux:</span>
+            <span class="ml-1 text-[#00F2A9]" id="robux-amount">Loading...</span>
+          </div>          
             <button onclick="toggleDepositModal()" class="deposit-glow bg-[#00F2A9] text-black hover:bg-[#00F2A9]/90 rounded-xl px-6 py-2">
               Deposit
             </button>
@@ -344,6 +344,26 @@
         modal.classList.toggle('active');
         overlay.classList.toggle('active');
       }
+
+  function fetchRobuxBalance() {
+    fetch('/get-robux-balance', {
+      credentials: 'include', 
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.robux !== undefined) {
+          document.getElementById('robux-amount').textContent = `${data.robux} Robux`;
+        } else {
+          document.getElementById('robux-amount').textContent = 'Failed to fetch balance';
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching Robux balance:', error);
+        document.getElementById('robux-amount').textContent = 'Error fetching balance';
+      });
+  }
+  fetchRobuxBalance();
+
     </script>
   </body>
 </html>
